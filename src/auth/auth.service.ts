@@ -18,21 +18,21 @@ export class AuthService {
   ) {}
 
   async authenticate(signInDto: SignInDto) {
-    const user = await this.prisma.user.findFirst({
+    const order = await this.prisma.order.findFirst({
       where: {
-        email: signInDto.email,
+        clientEmail: signInDto.clientEmail,
       },
     });
 
-    if (!user)
+    if (!order)
       throw new HttpException(
         'Não foi possível fazer o login!',
         HttpStatus.UNAUTHORIZED,
       );
 
     const passwordIsValid = await this.hashingService.compare(
-      signInDto.password,
-      user.passwordHash,
+      signInDto.emailPassword,
+      order.clientPasswordHash,
     );
 
     if (!passwordIsValid)
@@ -43,8 +43,8 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(
       {
-        sub: user.id,
-        email: user.email,
+        sub: order.id,
+        clientEmail: order.clientEmail,
       },
       {
         secret: this.jwtConfiguration.secret,
@@ -57,9 +57,9 @@ export class AuthService {
     );
 
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      id: order.id,
+      status: order.status,
+      clientEmail: order.clientEmail,
       token: token,
     };
   }

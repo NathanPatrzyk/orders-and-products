@@ -30,7 +30,7 @@ export class AuthTokenGuard implements CanActivate {
         this.jwtConfiguration,
       );
 
-      request['user'] = payload;
+      request['order'] = payload;
     } catch (error) {
       throw new HttpException('Token não encontrado!', HttpStatus.UNAUTHORIZED);
     }
